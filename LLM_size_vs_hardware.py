@@ -73,52 +73,76 @@ df = pd.concat(
     [
         make_df(model_rows, "Model Size Scaling: 8000x"),
         make_df(hardware_rows, "Hardware TFLOPS Scaling: 500x"),
-        make_df(dram_rows, "DRAM BW: 30x"),
-        make_df(interconnect_rows, "Interconnect BW: 10x"),
+        make_df(dram_rows, "DRAM Bandwidth Scaling: 30x"),
+        make_df(interconnect_rows, "Interconnect Bandwidth Scaling: 10x"),
     ],
     ignore_index=True,
 )
 
-# Create the scatter plot (one plot total, four colors via default color cycle)
-fig, ax = plt.subplots(figsize=(10, 6))
-
+# Create three separate figures
 # Define colors for each group
 colors = ['red', 'blue', 'green', 'orange']
-group_names = ["Model Size Scaling: 8000x", "Hardware TFLOPS Scaling: 500x", "DRAM BW: 30x", "Interconnect BW: 10x"]
+group_names = ["Model Size Scaling: 8000x", "Hardware TFLOPS Scaling: 500x", "DRAM Bandwidth Scaling: 30x", "Interconnect Bandwidth Scaling: 10x"]
 
-for i, (group, gdf) in enumerate(df.groupby("group")):
-    color = colors[i % len(colors)]
-    ax.scatter(gdf["date"], gdf["scaling"], label=group, alpha=1.0, color=color)
+# Calculate overall date range for consistent x-axis across all figures
+overall_min_date = df["date"].min()
+overall_max_date = df["date"].max()
+
+def create_plot(groups_to_include, title_suffix, figure_num):
+    fig, ax = plt.subplots(figsize=(10, 6))
     
-    # Add name labels near each point
-    for _, row in gdf.iterrows():
-        ax.annotate(row["name"], 
-                   (row["date"], row["scaling"]),
-                   xytext=(5, 5), 
-                   textcoords="offset points",
-                   fontsize=8,
-                   alpha=0.8)
+    # Plot groups in the desired order to maintain legend order
+    for group_name in group_names:
+        if group_name in groups_to_include:
+            gdf = df[df["group"] == group_name]
+            color_idx = group_names.index(group_name)
+            color = colors[color_idx]
+            ax.scatter(gdf["date"], gdf["scaling"], label=group_name, alpha=1.0, color=color)
+            
+            # Add name labels near each point
+            for _, row in gdf.iterrows():
+                ax.annotate(row["name"], 
+                           (row["date"], row["scaling"]),
+                           xytext=(5, 5), 
+                           textcoords="offset points",
+                           fontsize=8,
+                           alpha=0.8)
+    
+    # Axes formatting
+    ax.set_yscale("log")
+    ax.set_ylim(0.1, 10000)
+    ax.set_xlim(overall_min_date, overall_max_date)  # Set consistent x-axis range
+    ax.set_xlabel("Release date", fontsize=14)
+    ax.set_ylabel("Scaling (log scale)", fontsize=14)
+    # ax.set_title(f"Figure {figure_num}: {title_suffix}", fontsize=14)
+    
+    # X axis formatting for years
+    ax.xaxis.set_major_locator(mdates.YearLocator(base=1))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
+    fig.autofmt_xdate()
+    
+    ax.grid(True, which="both", linestyle="--", alpha=0.4)
+    legend = ax.legend(loc="upper left", fontsize=14)
+    
+    # Make legend text bold and set colors to match dots
+    for text in legend.get_texts():
+        text.set_weight('bold')
+        group_name = text.get_text()
+        if group_name in group_names:
+            color_idx = group_names.index(group_name)
+            text.set_color(colors[color_idx])
+    
+    # Increase tick label font size
+    ax.tick_params(axis='both', which='major', labelsize=12)
+    
+    plt.tight_layout()
+    plt.savefig(f"LLM_size_vs_hardware_figure_{figure_num}.png", dpi=300)
 
-# Axes formatting
-ax.set_yscale("log")
-ax.set_ylim(0.1, 10000)  # per request
-ax.set_xlabel("Release date", fontsize=14)
-ax.set_ylabel("Scaling (log scale)", fontsize=14)
-# ax.set_title("Scaling over LLM Model Size and Hardware Parameters", fontsize=14)
+# Figure 1: Only model scaling
+create_plot(["Model Size Scaling: 8000x"], "Model Scaling Only", 1)
 
-# X axis formatting for years
-ax.xaxis.set_major_locator(mdates.YearLocator(base=1))
-ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
-fig.autofmt_xdate()
+# Figure 2: Model and Hardware TFLOPS scalings
+create_plot(["Model Size Scaling: 8000x", "Hardware TFLOPS Scaling: 500x"], "Model and Hardware TFLOPS Scaling", 2)
 
-ax.grid(True, which="both", linestyle="--", alpha=0.4)
-legend = ax.legend(loc="upper left", fontsize=14)
-# Make legend text bold and set colors to match dots
-for i, text in enumerate(legend.get_texts()):
-    text.set_weight('bold')
-    text.set_color(colors[i % len(colors)])
-
-# Increase tick label font size
-ax.tick_params(axis='both', which='major', labelsize=12)
-
-plt.show()
+# Figure 3: All four scalings
+create_plot(["Model Size Scaling: 8000x", "Hardware TFLOPS Scaling: 500x", "DRAM Bandwidth Scaling: 30x", "Interconnect Bandwidth Scaling: 10x"], "All Four Scalings", 3)
