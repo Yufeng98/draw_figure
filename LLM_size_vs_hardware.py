@@ -52,13 +52,22 @@ hardware_rows = [
     ("TPUv7", "Oct-25", 243),
 ]
 
-dram_rows = [
+dram_bandwidth_rows = [
     ("HBM", "Oct-13", 1),
     ("HBM2", "Jan-16", 3),
     ("HBM2E", "Aug-19", 5),
     ("HBM3", "Jan-22", 10),
     ("HBM3E", "May-23", 19),
     ("HBM4", "Apr-25", 32),
+]
+
+dram_capacity_rows = [
+    ("HBM", "Oct-13", 1),
+    ("HBM2", "Jan-16", 2),
+    ("HBM2E", "Aug-19", 4),
+    ("HBM3", "Jan-22", 6),
+    ("HBM3E", "May-23", 9),
+    ("HBM4", "Apr-25", 16),
 ]
 
 interconnect_rows = [
@@ -73,16 +82,17 @@ df = pd.concat(
     [
         make_df(model_rows, "Model Size Scaling: 8000x"),
         make_df(hardware_rows, "Hardware TFLOPS Scaling: 500x"),
-        make_df(dram_rows, "DRAM Bandwidth Scaling: 30x"),
         make_df(interconnect_rows, "Interconnect Bandwidth Scaling: 10x"),
+        make_df(dram_bandwidth_rows, "DRAM Bandwidth Scaling: 30x"),
+        make_df(dram_capacity_rows, "DRAM Capacity Scaling: 16x"),
     ],
     ignore_index=True,
 )
 
-# Create three separate figures
+# Create five separate figures
 # Define colors for each group
-colors = ['red', 'blue', 'green', 'orange']
-group_names = ["Model Size Scaling: 8000x", "Hardware TFLOPS Scaling: 500x", "DRAM Bandwidth Scaling: 30x", "Interconnect Bandwidth Scaling: 10x"]
+colors = ['red', 'blue', 'orange', 'green', 'purple']
+group_names = ["Model Size Scaling: 8000x", "Hardware TFLOPS Scaling: 500x", "Interconnect Bandwidth Scaling: 10x", "DRAM Bandwidth Scaling: 30x", "DRAM Capacity Scaling: 16x"]
 
 # Calculate overall date range for consistent x-axis across all figures
 overall_min_date = df["date"].min()
@@ -144,5 +154,11 @@ create_plot(["Model Size Scaling: 8000x"], "Model Scaling Only", 1)
 # Figure 2: Model and Hardware TFLOPS scalings
 create_plot(["Model Size Scaling: 8000x", "Hardware TFLOPS Scaling: 500x"], "Model and Hardware TFLOPS Scaling", 2)
 
-# Figure 3: All four scalings
-create_plot(["Model Size Scaling: 8000x", "Hardware TFLOPS Scaling: 500x", "DRAM Bandwidth Scaling: 30x", "Interconnect Bandwidth Scaling: 10x"], "All Four Scalings", 3)
+# Figure 3: Model, Hardware TFLOPS and Interconnect BW Scaling
+create_plot(["Model Size Scaling: 8000x", "Hardware TFLOPS Scaling: 500x", "Interconnect Bandwidth Scaling: 10x"], "Model, Hardware TFLOPS and Interconnect BW Scaling", 3)
+
+# Figure 4: Add DRAM Bandwidth Scaling
+create_plot(["Model Size Scaling: 8000x", "Hardware TFLOPS Scaling: 500x", "Interconnect Bandwidth Scaling: 10x", "DRAM Bandwidth Scaling: 30x"], "All Four Scalings", 4)
+
+# Figure 5: Model, Hardware TFLOPS, DRAM BW and Capacity (no interconnect)
+create_plot(["Model Size Scaling: 8000x", "Hardware TFLOPS Scaling: 500x", "DRAM Bandwidth Scaling: 30x", "DRAM Capacity Scaling: 16x"], "Model, Hardware TFLOPS, DRAM BW and Capacity", 5)
