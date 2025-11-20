@@ -82,19 +82,20 @@ X_MARGIN = 0.5
 
 
 def _apply_axis_formatting() -> None:
-	plt.xlabel("Year")
-	plt.ylabel("Energy Consumption (TWh)")
+	plt.xlabel("Year", fontsize=24)
+	plt.ylabel("Energy Consumption", fontsize=24)
 	plt.xlim(X_LIMITS[0] - X_MARGIN, X_LIMITS[1] + X_MARGIN)
 	plt.ylim(0, Y_MAX)
 	plt.grid(alpha=0.3)
-	plt.xticks(fontsize=18)
-	plt.yticks(fontsize=18)
-	plt.legend(loc="upper left", fontsize=18)
+	plt.xticks(fontsize=20)
+	ax = plt.gca()
+	ax.tick_params(axis="y", which="both", left=False, right=False, labelleft=False)
+	plt.legend(loc="upper left", fontsize=20)
 	plt.tight_layout()
 
 
-def plot_historical_only() -> None:
-	"""Plot only the historical data up to 2024."""
+def plot_Historical_only() -> None:
+	"""Plot only the Historical data up to 2024."""
 
 	plt.figure(figsize=(10, 6))
 	# plt.plot(
@@ -103,7 +104,7 @@ def plot_historical_only() -> None:
 	# 	color="tab:blue",
 	# 	linewidth=2,
 	# 	marker="o",
-	# 	label="2015-2019 (historical)",
+	# 	label="2015-2019 (Historical)",
 	# )
 	plt.plot(
 		YEARS_PRE_2020 + YEARS_2020_2024,
@@ -111,14 +112,14 @@ def plot_historical_only() -> None:
 		color="tab:blue",
 		linewidth=2,
 		marker="o",
-		label="2015-2024 (historical)",
+		label="2015-2024 (Historical)",
 	)
 	_apply_axis_formatting()
-	plt.savefig("power_consumption_historical.png", dpi=300)
+	plt.savefig("power_consumption_Historical.png", dpi=300)
 
 
 def plot_with_projection() -> None:
-	"""Plot the historical data plus projections from 2025 onward."""
+	"""Plot the Historical data plus projections from 2025 onward."""
 
 	plt.figure(figsize=(10, 6))
 	# plt.plot(
@@ -127,7 +128,7 @@ def plot_with_projection() -> None:
 	# 	color="tab:blue",
 	# 	linewidth=2,
 	# 	marker="o",
-	# 	label="2015-2019 (historical)",
+	# 	label="2015-2019 (Historical)",
 	# )
 	plt.plot(
 		YEARS_PRE_2020 + YEARS_2020_2024,
@@ -135,7 +136,7 @@ def plot_with_projection() -> None:
 		color="tab:blue",
 		linewidth=2,
 		marker="o",
-		label="2015-2024 (historical)",
+		label="2015-2024 (Historical)",
 	)
 	plt.plot(
 		YEARS_PROJECTED,
@@ -144,7 +145,7 @@ def plot_with_projection() -> None:
 		linewidth=2,
 		linestyle="--",
 		marker="o",
-		label="2025-2030 (projected)",
+		label="2025-2030 (Projected)",
 	)
 	_apply_axis_formatting()
 	plt.savefig("power_consumption_with_projection.png", dpi=300)
@@ -172,8 +173,15 @@ def plot_country_comparison() -> None:
 		ax.invert_yaxis()
 		ax.grid(axis="x", alpha=0.3, linestyle=":")
 		ax.set_facecolor("white")
-		ax.tick_params(axis="y", labelsize=24)
-		ax.tick_params(axis="x", labelsize=16)
+		ax.tick_params(axis="y", labelsize=28)
+		ax.tick_params(
+			axis="x",
+			labelsize=14,
+			which="both",
+			bottom=False,
+			top=False,
+			labelbottom=False,
+		)
     
 
 	# ax_close.set_xlabel("Energy Consumption (TWh)", fontsize=22)
@@ -199,7 +207,7 @@ def plot_country_comparison() -> None:
 def main() -> None:
 	"""Render both projections per user specification."""
 
-	plot_historical_only()
+	plot_Historical_only()
 	plot_with_projection()
 	plot_country_comparison()
 
