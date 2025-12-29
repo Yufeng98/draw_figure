@@ -33,34 +33,53 @@ model_rows = [
 ]
 
 hardware_rows = [
-    ("V100", "Jun-17", 3),
-    ("TPUv2", "Dec-17", 1),
-    ("TPUv3", "Dec-18", 3),
-    ("A100", "Jun-20", 7),
-    ("MI100", "Nov-20", 4),
-    ("MI250X", "Nov-21", 9),
-    ("TPUv4", "Dec-21", 6),
-    ("H100", "Sep-22", 22),
-    ("MI300X", "Dec-23", 29),
-    ("TPUv5p", "Dec-23", 10),
-    ("B200", "Oct-24", 57),
-    ("TPUv6", "Dec-24", 20),
-    ("MI350X", "Jun-25", 51),
-    ("TPUv7", "Oct-25", 51),
+    ("P100", "Jun-16", 1),
+    ("V100", "Jun-17", 7),
+    ("TPUv2", "Dec-17", 2),
+    ("TPUv3", "Dec-18", 6),
+    ("A100", "Jun-20", 16),
+    ("MI100", "Nov-20", 10),
+    ("MI250X", "Nov-21", 20),
+    ("TPUv4", "Dec-21", 14),
+    ("H100", "Sep-22", 52),
+    ("MI300X", "Dec-23", 69),
+    ("TPUv5p", "Dec-23", 24),
+    ("B200", "Dec-24", 135),
+    ("TPUv6", "Dec-24", 48),
+    ("MI350X", "Jun-25", 122),
+    ("TPUv7", "Oct-25", 121),
 ]
 
 dram_bandwidth_rows = [
+    ("P100", "Jun-16", 1),
     ("V100", "Jun-17", 1),
-    ("A100", "Jun-20", 2.2),
-    ("H100", "Sep-22", 3.7),
-    ("B200", "Mar-24", 8.9),
+    ("TPUv2", "Dec-17", 1),
+    ("TPUv3", "Dec-18", 1),
+    ("A100", "Jun-20", 3),
+    ("MI100", "Nov-20", 2),
+    ("MI250X", "Nov-21", 5),
+    ("TPUv4", "Dec-21", 2),
+    ("H100", "Sep-22", 5),
+    ("MI300X", "Dec-23", 7),
+    ("TPUv5p", "Dec-23", 4),
+    ("B200", "Dec-24", 11),
+    ("TPUv7", "Oct-25", 11),
 ]
 
 dram_capacity_rows = [
-    ("V100", "Jun-17", 1),
-    ("A100", "Jun-20", 2.5),
-    ("H100", "Sep-22", 2.5),
-    ("B200", "Mar-24", 6),
+    ("P100", "Jun-16", 1),
+    ("V100", "Jun-17", 2),
+    ("TPUv2", "Dec-17", 1),
+    ("TPUv3", "Dec-18", 2),
+    ("A100", "Jun-20", 5),
+    ("MI100", "Nov-20", 2),
+    ("MI250X", "Nov-21", 8),
+    ("TPUv4", "Dec-21", 2),
+    ("H100", "Sep-22", 5),
+    ("MI300X", "Dec-23", 12),
+    ("TPUv5p", "Dec-23", 6),
+    ("B200", "Dec-24", 12),
+    ("TPUv7", "Oct-25", 12),
 ]
 
 interconnect_rows = [
@@ -72,23 +91,27 @@ interconnect_rows = [
 
 df = pd.concat(
     [
-        make_df(model_rows, "Model Size Scaling: 4x per year"),
-        make_df(hardware_rows, "Hardware TFLOPS Scaling: 66% per year"),
-        make_df(interconnect_rows, "Interconnect Bandwidth Scaling: 29% per year"),
-        make_df(dram_bandwidth_rows, "DRAM Bandwidth Scaling: 37% per year"),
-        make_df(dram_capacity_rows, "DRAM Capacity Scaling: 29% per year"),
+        make_df(model_rows, "Model Size: 4x per year"),
+        make_df(hardware_rows, "Hardware TFLOPS: 73% per year"),
+        make_df(interconnect_rows, "Interconnect Bandwidth: 29% per year"),
+        make_df(dram_bandwidth_rows, "DRAM Bandwidth: 31% per year"),
+        make_df(dram_capacity_rows, "DRAM Capacity: 32% per year"),
     ],
     ignore_index=True,
 )
 
 # Create five separate figures
 # Define colors for each group
-colors = ['red', 'blue', 'orange', 'green', 'purple']
-group_names = ["Model Size Scaling: 4x per year", "Hardware TFLOPS Scaling: 66% per year", "Interconnect Bandwidth Scaling: 29% per year", "DRAM Bandwidth Scaling: 37% per year", "DRAM Capacity Scaling: 29% per year"]
+colors = ['red', 'blue', 'orange', 'green', 'red']
+group_names = ["Model Size: 4x per year", "Hardware TFLOPS: 73% per year", "Interconnect Bandwidth: 29% per year", "DRAM Bandwidth: 31% per year", "DRAM Capacity: 32% per year"]
 
 # Calculate overall date range for consistent x-axis across all figures
 overall_min_date = df["date"].min()
 overall_max_date = df["date"].max()
+
+overall_min_date = pd.to_datetime("Dec-15", format="%b-%y")
+overall_max_date = pd.to_datetime("Jan-26", format="%b-%y")
+
 
 def create_plot(groups_to_include, title_suffix, figure_num):
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -112,7 +135,7 @@ def create_plot(groups_to_include, title_suffix, figure_num):
     
     # Axes formatting
     ax.set_yscale("log")
-    ax.set_ylim(0.1, 20000)
+    ax.set_ylim(0.5, 300)
     ax.set_xlim(overall_min_date, overall_max_date)  # Set consistent x-axis range
     ax.set_xlabel("Release date", fontsize=16)
     ax.set_ylabel("Scaling (log scale)", fontsize=16)
@@ -140,22 +163,27 @@ def create_plot(groups_to_include, title_suffix, figure_num):
     plt.tight_layout()
     plt.savefig(f"LLM_size_vs_hardware_figure_{figure_num}.png", dpi=300)
 
-# Figure 1: Only model scaling
-create_plot(["Model Size Scaling: 4x per year"], "Model Scaling Only", 1)
+# # Figure 1: Only model scaling
+# create_plot(["Model Size: 4x per year"], "Model Scaling Only", 1)
 
-# Figure 2: Model and Hardware TFLOPS scalings
-create_plot(["Model Size Scaling: 4x per year", "Hardware TFLOPS Scaling: 66% per year"], "Model and Hardware TFLOPS Scaling", 2)
+# # Figure 2: Model and Hardware TFLOPS scalings
+# create_plot(["Model Size: 4x per year", "Hardware TFLOPS: 73% per year"], "Model and Hardware TFLOPS Scaling", 2)
 
-# Figure 3: Model, Hardware TFLOPS and Interconnect BW Scaling
-create_plot(["Model Size Scaling: 4x per year", "Hardware TFLOPS Scaling: 66% per year", "Interconnect Bandwidth Scaling: 29% per year"], "Model, Hardware TFLOPS and Interconnect BW Scaling", 3)
+# # Figure 3: Model, Hardware TFLOPS and Interconnect BW Scaling
+# create_plot(["Model Size: 4x per year", "Hardware TFLOPS: 73% per year", "Interconnect Bandwidth: 29% per year"], "Model, Hardware TFLOPS and Interconnect BW Scaling", 3)
 
-# Figure 4: Add DRAM Bandwidth Scaling
-create_plot(["Model Size Scaling: 4x per year", "Hardware TFLOPS Scaling: 66% per year", "Interconnect Bandwidth Scaling: 29% per year", "DRAM Bandwidth Scaling: 37% per year"], "All Four Scalings", 4)
+# # Figure 4: Add DRAM Bandwidth Scaling
+# create_plot(["Model Size: 4x per year", "Hardware TFLOPS: 73% per year", "Interconnect Bandwidth: 29% per year", "DRAM Bandwidth: 31% per year"], "All Four Scalings", 4)
 
-# Figure 5: Model, Hardware TFLOPS, DRAM BW and Capacity (no interconnect)
-create_plot(["Model Size Scaling: 4x per year", "Hardware TFLOPS Scaling: 66% per year", "DRAM Bandwidth Scaling: 37% per year", "DRAM Capacity Scaling: 29% per year"], "Model, Hardware TFLOPS, DRAM BW and Capacity", 5)
+# # Figure 5: Model, Hardware TFLOPS, DRAM BW and Capacity (no interconnect)
+# create_plot(["Model Size: 4x per year", "Hardware TFLOPS: 73% per year", "DRAM Bandwidth: 31% per year", "DRAM Capacity: 32% per year"], "Model, Hardware TFLOPS, DRAM BW and Capacity", 5)
 
+# # Figure 2: Model, Hardware TFLOPS scalings and DRAM BW
+# create_plot(["Model Size: 4x per year", "Hardware TFLOPS: 73% per year", "DRAM Bandwidth: 31% per year"], "Model, Hardware TFLOPS Scaling and DRAM BW", 6)
 
-# Figure 2: Model, Hardware TFLOPS scalings and DRAM BW
-create_plot(["Model Size Scaling: 4x per year", "Hardware TFLOPS Scaling: 66% per year", "DRAM Bandwidth Scaling: 37% per year"], "Model, Hardware TFLOPS Scaling and DRAM BW", 6)
+create_plot(["Hardware TFLOPS: 73% per year"], "Hardware TFLOPS Scaling", 7)
+
+create_plot(["Hardware TFLOPS: 73% per year", "DRAM Bandwidth: 31% per year"], "Model, Hardware TFLOPS Scaling and DRAM BW", 8)
+
+create_plot(["Hardware TFLOPS: 73% per year", "DRAM Bandwidth: 31% per year", "DRAM Capacity: 32% per year"], "Model, Hardware TFLOPS Scaling, DRAM BW and capacity", 9)
 

@@ -83,7 +83,7 @@ X_MARGIN = 0.5
 
 def _apply_axis_formatting() -> None:
 	plt.xlabel("Year", fontsize=24)
-	plt.ylabel("Energy Consumption", fontsize=24)
+	plt.ylabel("Power Consumption", fontsize=24)
 	plt.xlim(X_LIMITS[0] - X_MARGIN, X_LIMITS[1] + X_MARGIN)
 	plt.ylim(0, Y_MAX)
 	plt.grid(alpha=0.3)
@@ -184,7 +184,7 @@ def plot_country_comparison() -> None:
 		)
     
 
-	# ax_close.set_xlabel("Energy Consumption (TWh)", fontsize=22)
+	# ax_close.set_xlabel("Power Consumption (TWh)", fontsize=22)
 	ax_close.set_xlim(0, 1800)
 	ax_far.set_xlim(3500, max(values) + 500)
 
